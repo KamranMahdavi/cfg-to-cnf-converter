@@ -6,6 +6,9 @@ def parse_grammar(grammar):
 
     for line in lines:
         _parse_grammar_line(line, productions)
+
+    if "S" not in productions:
+        raise ValueError("Invalid grammar format: No start variable (S) detected.")
     
     return productions
 
