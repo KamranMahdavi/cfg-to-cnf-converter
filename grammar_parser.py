@@ -1,18 +1,33 @@
 import re
 
+variable_pattern = r"[A-Z]([a-z]*'*|_[a-z]+|[a-z]*_[0-9]+|[A-Z]*|[0-9]*)"
+terminal_pattern = r"[a-zε]"
+
 def parse_grammar(grammar):
     productions = dict()
+    variables = set()
+    terminals = set()
     lines = grammar.splitlines()
 
     for line in lines:
-        _parse_grammar_line(line, productions)
+        _parse_grammar_line(line, productions, variables, terminals)
 
     if "S" not in productions:
         raise ValueError("Invalid grammar format: No start variable (S) detected.")
     
-    return productions
+    if productions.keys() != variables:
+        raise ValueError("Invalid grammar format: Undefined variable in RHS. Make sure symbols are separated by spaces.")
+    
+    formalized_grammar = {
+        "start": "S",
+        "productions": productions,
+        "variables": variables,
+        "terminals": terminals
+    }
+    
+    return formalized_grammar
 
-def _parse_grammar_line(line, productions):
+def _parse_grammar_line(line, productions, variables, terminals):
     normalized_line = _normalize(line)
     split_line = normalized_line.split("->")
 
@@ -24,29 +39,37 @@ def _parse_grammar_line(line, productions):
 
     _check_LHS(left_side)
     
-    right_side_list = _check_RHS(right_side)
-    right_side_list = list(set(right_side_list))
+    right_side_list = list(set(_process_RHS(right_side, variables, terminals)))
     
     _add_rules(left_side, right_side_list, productions)
 
 
-def _check_RHS(string):
+def _process_RHS(string, variables, terminals):
     RHS_list = [form.strip() for form in string.split("|")]
-    if any(" " in form for form in RHS_list):
-        raise ValueError("Invalid grammar format: Invalid RHS expression.")
+    elements = list()
+
+    for form in RHS_list:
+        elements = form.split()
+        for element in elements:
+            if re.fullmatch(variable_pattern, element):
+                variables.add(element)
+            elif re.fullmatch(terminal_pattern, element):
+                terminals.add(element)
+            else:
+                raise ValueError(f"Invalid grammar format: Invalid RHS element: {element}\nMake sure symbols are separated by spaces.")
+            
     return RHS_list
 
 def _check_LHS(string):
     if " " in string:
         raise ValueError("Invalid grammar format: There should be only one variable on the LHS.")
-    pattern = "[A-Z][A-Za-z0-9'_]*"
-    result = re.match(pattern, string)
+    result = re.match(variable_pattern, string)
     if not result:
         raise ValueError("Invalid grammar format: Invalid LHS variable.")
 
 def _normalize(string):
-    or_list = ["∣", "│", "┃", "¦"]
-    epsilon_list = ["λ", "epsilon", "eps"]
+    or_list = {"∣", "│", "┃", "¦"}
+    epsilon_list = {"λ", "epsilon", "eps"}
 
     normalized_input = ""
 
