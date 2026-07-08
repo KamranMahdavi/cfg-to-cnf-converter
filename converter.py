@@ -80,3 +80,29 @@ def _get_nullable_combinations_help(expression, nullables, index=0):
 
     else:
         return {(expression[index],) + i for i in _get_nullable_combinations_help(expression, nullables, index + 1)}
+    
+
+
+def remove_unit_rules(formalized_grammar):
+    products = formalized_grammar['productions']
+    variables = formalized_grammar['variables']
+    unit_rules_dict = _find_unit_rules(products, variables)
+    while(len(unit_rules_dict) != 0):
+        _remove_unit(products, unit_rules_dict)
+        unit_rules_dict = _find_unit_rules(products, variables)
+
+def _find_unit_rules(productions, variables):
+    unit_rules = dict()
+    for variable in productions:
+        for rule in productions[variable]:
+            if len(rule) == 1 and rule[0] in variables:
+                if not variable in unit_rules:
+                    unit_rules[variable] = set()
+                unit_rules[variable].add(rule[0])
+    return unit_rules
+
+def _remove_unit(productions, unit_rules_dict):
+    for variable in unit_rules_dict:
+        for unit_var in unit_rules_dict[variable]:
+            productions[variable].update(productions[unit_var])
+            productions[variable].remove(tuple(unit_var))
