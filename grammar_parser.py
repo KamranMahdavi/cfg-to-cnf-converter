@@ -7,7 +7,7 @@ def parse_grammar(grammar):
     productions = dict()
     variables = set()
     terminals = set()
-    lines = grammar.splitlines()
+    lines = grammar.strip().splitlines()
 
     for line in lines:
         _parse_grammar_line(line, productions, variables, terminals)
@@ -87,6 +87,36 @@ def _normalize(string):
     
 def _add_rules(LHS, RHS_list, productions):
     if LHS not in productions:
-        productions[LHS] = []
+        productions[LHS] = set()
     
-    productions[LHS].extend(RHS_list)
+    productions[LHS].update(RHS_list)
+
+def tupleize_productions(formal_grammar):
+    productions = formal_grammar["productions"]
+    new_productions = dict()
+    new_RHS = set()
+    new_expression = tuple()
+    for key in productions:
+        RHS = productions[key]
+        for expression in RHS:
+            new_expression = tuple(expression.split(" "))
+            new_RHS.add(new_expression)
+            new_expression = set()
+
+        new_productions[key] = new_RHS
+        new_RHS = set()
+    
+    formal_grammar["productions"] = new_productions
+
+def stringify_productions(formal_grammar):
+    productions = formal_grammar["productions"]
+    new_productions = dict()
+    new_RHS = set()
+    for key in productions:
+        RHS = productions[key]
+        for expression in RHS:
+            new_RHS.add(" ".join(expression))
+        new_productions[key] = new_RHS
+        new_RHS = set()
+    
+    formal_grammar["productions"] = new_productions
