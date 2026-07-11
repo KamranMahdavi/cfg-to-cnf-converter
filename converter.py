@@ -5,9 +5,13 @@ def normalize_start_symbol(formalized_grammar):
         new_variable = _generate_new_variable(products, variables, start=True)
         formalized_grammar["start"] = new_variable
 
-def _generate_new_variable(productions, variables, rules=None, start=False):
+def _generate_new_variable(productions, variables, rules=None, start=False, terminal=False):
     index = 0
-    new_variable = "S" if start == True else "A"
+    new_variable = "A"
+    if terminal == True:
+        new_variable = "T"
+    else:
+        new_variable = "S"
 
     while(f'{new_variable}{index}' in variables):
         index += 1
@@ -15,7 +19,7 @@ def _generate_new_variable(productions, variables, rules=None, start=False):
     new_variable += f'{index}'
 
     if start == True:
-        productions[new_variable] = {("S",)}    
+        productions[new_variable] = {("S",)}
     else:
         productions[new_variable] = {rules}
 
@@ -136,3 +140,60 @@ def _binarize_help(productions, variables, long_rules):
             new_var = _generate_new_variable(productions, variables, rule[1:])
             productions[variable].add((rule[0], new_var))
             productions[variable].remove(rule)
+
+
+
+def create_terminal_variables(formalized_grammar):
+    products = formalized_grammar['productions']
+    variables = formalized_grammar['variables']
+    terminals = formalized_grammar['terminals']
+
+    mixed_rules = _get_mixed_RHS_rules(products, terminals)
+    _create_terminal_variables_help(products, variables, terminals, mixed_rules)
+
+def _get_mixed_RHS_rules(productions, terminals):
+    mixed_RHS_dict = dict()
+    for variable in productions:
+        for rule in productions[variable]:
+            if len(rule) > 1:
+                for element in rule:
+                    if element in terminals:
+                        if variable not in mixed_RHS_dict:
+                            mixed_RHS_dict[variable] = set()
+                        mixed_RHS_dict[variable].add(rule)
+    return mixed_RHS_dict
+
+def _create_terminal_variables_help(productions, variables, terminals, mixed_rules):
+    to_update = dict()
+    to_remove = dict()
+    for variable in mixed_rules:
+        to_update[variable] = set()
+        to_remove[variable] = set()
+        new_rule = list()
+        for rule in mixed_rules[variable]:
+            for element in rule:
+                term_var = element
+                if element in terminals:
+                    term_var = _get_terminal_variable(element, productions)
+                    if not term_var:
+                        term_var = _generate_new_variable(productions, variables, tuple(element), terminal=True)
+
+                new_rule.append(term_var)
+
+            to_update[variable].add(tuple(new_rule))
+            to_remove[variable].add(rule)
+            new_rule.clear()
+
+    _add_new_terminal_rules(productions, to_update, to_remove)
+
+def _get_terminal_variable(terminal, productions):
+    for variable in productions:
+        if productions[variable] == {tuple(terminal)}:
+            return variable
+    return None
+
+def _add_new_terminal_rules(productions, new_rules, rules_to_remove):
+    for variable in rules_to_remove:
+        for rule in rules_to_remove[variable]:
+            productions[variable].remove(rule)
+        productions[variable].update(new_rules[variable])
