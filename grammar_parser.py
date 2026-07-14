@@ -12,12 +12,20 @@ def parse_grammar(grammar):
     for line in lines:
         _parse_grammar_line(line, productions, variables, terminals)
 
+    defined_variables = set(productions.keys())
+
     if "S" not in productions:
         raise ValueError("Invalid grammar format: No start variable (S) detected.")
     
-    if productions.keys() != variables:
-        raise ValueError("Invalid grammar format: Undefined variable in RHS. Make sure symbols are separated by spaces.")
+    if len(variables - defined_variables) != 0:
+        raise ValueError(
+            f"Invalid grammar format: Undefined variable(s) in RHS: "
+            f"{variables - defined_variables}.\n"
+            "Make sure symbols are separated by spaces."
+        )
     
+    variables = defined_variables
+
     formalized_grammar = {
         "start": "S",
         "productions": productions,
@@ -38,9 +46,7 @@ def _parse_grammar_line(line, productions, variables, terminals):
     right_side = split_line[1].strip()
 
     _check_LHS(left_side)
-    
-    right_side_list = list(set(_process_RHS(right_side, variables, terminals)))
-    
+    right_side_list = set(_process_RHS(right_side, variables, terminals))
     _add_rules(left_side, right_side_list, productions)
 
 
