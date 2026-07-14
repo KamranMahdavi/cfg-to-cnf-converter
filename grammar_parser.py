@@ -126,3 +126,41 @@ def stringify_productions(formal_grammar):
         new_RHS = set()
     
     formal_grammar["productions"] = new_productions
+
+
+
+def order_grammar(formalized_grammar):
+    ordered_grammar = {
+        'start': formalized_grammar['start'],
+        'productions': dict(),
+        'variables': list(),
+        'terminals': list()
+    }
+
+    ordered_grammar["variables"] = _sort_variables(formalized_grammar['variables'], ordered_grammar["start"])
+    ordered_grammar["terminals"] = sorted(formalized_grammar['terminals'])
+    for variable in ordered_grammar['variables']:
+        ordered_grammar["productions"][variable] = sorted(formalized_grammar["productions"][variable])
+
+    return ordered_grammar
+
+def _sort_variables(variables, start):
+    sorted_vars = sorted(variables)
+    sorted_vars.remove(start)
+    sorted_vars.insert(0, start)
+    return sorted_vars
+
+def serialize_grammar(ordered_grammar):
+    grammar_list = []
+    for variable in ordered_grammar['productions']:
+        var = [f"{variable} →"]
+        line = []
+        
+        for rule in ordered_grammar['productions'][variable]:
+            line.append(" ".join(rule))
+
+        var.append(" | ".join(line))
+        grammar_list.append(" ".join(var))
+
+    serialized_grammar = "\n".join(grammar_list)
+    return serialized_grammar
