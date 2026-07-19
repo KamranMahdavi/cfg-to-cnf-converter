@@ -39,9 +39,12 @@ def remove_epsilon_rules(formalized_grammar):
     products = formalized_grammar["productions"]
     start = formalized_grammar["start"]
     nullables = _find_nullable(products, start)
+    if len(nullables) == 0:
+        return False
     while(len(nullables) != 0):
         _remove_epsilon(products, nullables)
         nullables = _find_nullable(products, start)
+    return True
 
 def _find_nullable(productions, start):
     nullables = set()
@@ -93,9 +96,12 @@ def remove_unit_rules(formalized_grammar):
     products = formalized_grammar['productions']
     variables = formalized_grammar['variables']
     unit_rules_dict = _find_unit_rules(products, variables)
+    if len(unit_rules_dict) == 0:
+        return False
     while(len(unit_rules_dict) != 0):
         _remove_unit(products, unit_rules_dict)
         unit_rules_dict = _find_unit_rules(products, variables)
+    return True
 
 def _find_unit_rules(productions, variables):
     unit_rules = dict()
@@ -119,10 +125,12 @@ def binarize(formalized_grammar):
     products = formalized_grammar['productions']
     variables = formalized_grammar['variables']
     longs = _find_long_RHS(products)
-
+    if len(longs) == 0:
+        return False
     while(len(longs) != 0):
         _binarize_help(products, variables, longs)
         longs = _find_long_RHS(products)
+    return True
 
 def _find_long_RHS(productions):
     long_RHS_dict = dict()
@@ -149,7 +157,10 @@ def create_terminal_variables(formalized_grammar):
     terminals = formalized_grammar['terminals']
 
     mixed_rules = _get_mixed_RHS_rules(products, terminals)
+    if len(mixed_rules) == 0:
+        return False
     _create_terminal_variables_help(products, variables, terminals, mixed_rules)
+    return True
 
 def _get_mixed_RHS_rules(productions, terminals):
     mixed_RHS_dict = dict()
