@@ -129,7 +129,7 @@ def stringify_productions(formal_grammar):
 
 
 
-def order_grammar(formalized_grammar):
+def _order_grammar(formalized_grammar):
     ordered_grammar = {
         'start': formalized_grammar['start'],
         'productions': dict(),
@@ -150,7 +150,8 @@ def _sort_variables(variables, start):
     sorted_vars.insert(0, start)
     return sorted_vars
 
-def serialize_grammar(ordered_grammar):
+def serialize_grammar(formalized_grammar):
+    ordered_grammar = _order_grammar(formalized_grammar)
     grammar_list = []
     for variable in ordered_grammar['productions']:
         var = [f"{variable} →"]
