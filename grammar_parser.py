@@ -10,6 +10,8 @@ def parse_grammar(grammar):
     lines = grammar.strip().splitlines()
 
     for line in lines:
+        if len(line) == 0:
+            continue
         _parse_grammar_line(line, productions, variables, terminals)
 
     defined_variables = set(productions.keys())
