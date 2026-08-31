@@ -6,10 +6,12 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QMainWindow,
     QPlainTextEdit,
-    QFrame
+    QFrame,
+    QMessageBox
 )
 
 from PyQt5.QtCore import Qt
+from backend import convert
 
 class ConvertWindow(QMainWindow):
 
@@ -37,6 +39,7 @@ class ConvertWindow(QMainWindow):
 
     def setup_connections(self):
         self.clear_button.clicked.connect(self.clear_all)
+        self.convert_button.clicked.connect(self.convert_grammar)
 
     def setup_layout(self):
         left_layout = QVBoxLayout()
@@ -77,3 +80,32 @@ class ConvertWindow(QMainWindow):
     def clear_all(self):
         self.input_textbox.clear()
         self.output_textbox.clear()
+
+    def convert_grammar(self):
+        input_grammar_string = self.input_textbox.toPlainText()
+        if input_grammar_string == "":
+            self.throw_error(2)
+            return
+
+        try:
+            cnf_result = convert(input_grammar_string)
+        except ValueError as error:
+            self.throw_error(1, str(error))
+            return
+        else:
+            self.output_textbox.setPlainText(cnf_result)
+
+    def throw_error(self, type, message=""):
+        error_window = QMessageBox(self)
+        if type == 1:
+            error_window.setWindowTitle("Error occured")
+            error_window.setText("Invalid Grammar Format")
+            error_window.setInformativeText(message)
+            error_window.setIcon(QMessageBox.Critical)
+            error_window.exec_()
+        elif type == 2:
+            error_window = QMessageBox.warning(
+                self,
+                "Empty Input",
+                "Enter or import a context-free grammar before converting."
+            )
