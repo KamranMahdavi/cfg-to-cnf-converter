@@ -17,11 +17,11 @@ def parse_grammar(grammar):
     defined_variables = set(productions.keys())
 
     if "S" not in productions:
-        raise ValueError("Invalid grammar format: No start variable (S) detected.")
+        raise ValueError("No start variable (S) detected.")
     
     if len(variables - defined_variables) != 0:
         raise ValueError(
-            f"Invalid grammar format: Undefined variable(s) in RHS: "
+            f"Undefined variable(s) in RHS:\n"
             f"{variables - defined_variables}.\n"
             "Make sure symbols are separated by spaces."
         )
@@ -42,7 +42,10 @@ def _parse_grammar_line(line, productions, variables, terminals):
     split_line = normalized_line.split("->")
 
     if len(split_line) != 2:
-        raise ValueError("Invalid grammar format.")
+        raise ValueError(
+            "Invalid production format:\n"
+            f"{normalized_line}"
+        )
         
     left_side = split_line[0].strip()
     right_side = split_line[1].strip()
@@ -64,16 +67,16 @@ def _process_RHS(string, variables, terminals):
             elif re.fullmatch(terminal_pattern, element):
                 terminals.add(element)
             else:
-                raise ValueError(f"Invalid grammar format: Invalid RHS element: {element}\nMake sure symbols are separated by spaces.")
+                raise ValueError(f"Invalid RHS element:\n{element}\nMake sure symbols are separated by spaces.")
             
     return RHS_list
 
 def _check_LHS(string):
     if " " in string:
-        raise ValueError("Invalid grammar format: There should be only one variable on the LHS.")
+        raise ValueError("There should be only one variable on the LHS.")
     result = re.match(variable_pattern, string)
     if not result:
-        raise ValueError("Invalid grammar format: Invalid LHS variable.")
+        raise ValueError("Invalid LHS variable.")
 
 def _normalize(string):
     or_list = {"∣", "│", "┃", "¦"}
