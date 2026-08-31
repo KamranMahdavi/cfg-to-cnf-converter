@@ -4,20 +4,21 @@ from grammar_parser import parse_grammar, tupleize_productions, serialize_gramma
 
 def convert(grammar):
     formalized_grammar = parse_grammar(grammar)
-    tuple_grammar = tupleize_productions(formalized_grammar)
-    normalize_start_symbol(tuple_grammar)
-    remove_epsilon_rules(tuple_grammar)
-    remove_unit_rules(tuple_grammar)
-    binarize(tuple_grammar)
-    create_terminal_variables(tuple_grammar)
-    return serialize_grammar(tuple_grammar)
+    tupleize_productions(formalized_grammar)
+    normalize_start_symbol(formalized_grammar)
+    remove_epsilon_rules(formalized_grammar)
+    remove_unit_rules(formalized_grammar)
+    binarize(formalized_grammar)
+    create_terminal_variables(formalized_grammar)
+    return serialize_grammar(formalized_grammar)
 
 def analyze(grammar):
     step_list = []
     title = "The Original Grammar"
     description = "The original grammar before any changes."
 
-    formalized_grammar = tupleize_productions(parse_grammar(grammar))
+    formalized_grammar = parse_grammar(grammar)
+    tupleize_productions(formalized_grammar)
     step_list.append(_take_snapshot(formalized_grammar, title, description))
 
     normalize_start_symbol(formalized_grammar)
