@@ -19,7 +19,7 @@ def analyze(grammar):
 
     formalized_grammar = parse_grammar(grammar)
     tupleize_productions(formalized_grammar)
-    step_list.append(_take_snapshot(formalized_grammar, title, description))
+    step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
     normalize_start_symbol(formalized_grammar)
     title = "Step 1: Remove the start symbol from the right-hand side"
@@ -31,7 +31,7 @@ def analyze(grammar):
             f"we introduced a new start variable ({formalized_grammar['start']}), "
             "which does not occur on any rule's right-hand side."
         )
-    step_list.append(_take_snapshot(formalized_grammar, title, description))
+    step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
     changed = remove_epsilon_rules(formalized_grammar)
     title = "Step 2: Remove ε-rules"
@@ -47,7 +47,7 @@ def analyze(grammar):
             'obtained by omitting any subset of its nullable variables.\n' 
             f'This procedure is done for all variables except for the start variable {formalized_grammar["start"]}.'
         )
-    step_list.append(_take_snapshot(formalized_grammar, title, description))
+    step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
     changed = remove_unit_rules(formalized_grammar)
     title = "Step 3: Remove unit rules"
@@ -59,7 +59,7 @@ def analyze(grammar):
             'To remove them, simply replace T with the non-unit rules on its right-hand side.\n'
             'This process is repeated until all unit rules get removed.'
         )
-    step_list.append(_take_snapshot(formalized_grammar, title, description))
+    step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
     changed = binarize(formalized_grammar)
     title = "Step 4: Binarize rules"
@@ -73,7 +73,7 @@ def analyze(grammar):
             'Each helper variable replaces a part of the original production, until every rule has a right-hand side\n'
             'of at most two symbols.'
         )
-    step_list.append(_take_snapshot(formalized_grammar, title, description))
+    step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
     changed = create_terminal_variables(formalized_grammar)
     title = "Step 5: Terminal replacement"
@@ -87,13 +87,9 @@ def analyze(grammar):
             'that only derives that specific terminal.\n\n'
             'With this, the conversion is complete.'
         )
-    step_list.append(_take_snapshot(formalized_grammar, title, description))
+    step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
     return step_list
-
-def _serialize_CFG(formalized_grammar):
-    grammar_deepcopy = copy.deepcopy(formalized_grammar)
-    return serialize_grammar(grammar_deepcopy)
 
 class ConversionStep:
 
@@ -103,6 +99,6 @@ class ConversionStep:
         self.snapshot = snapshot
 
 def _take_snapshot(snapshot, title="", description=""):
-    display_grammar = _serialize_CFG(snapshot)
+    display_grammar = copy.deepcopy(snapshot)
     step = ConversionStep(display_grammar, title, description)
     return step
