@@ -7,7 +7,8 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QPlainTextEdit,
     QFrame,
-    QMessageBox
+    QMessageBox,
+    QFileDialog
 )
 
 from PyQt5.QtCore import Qt
@@ -40,6 +41,7 @@ class ConvertWindow(QMainWindow):
     def setup_connections(self):
         self.clear_button.clicked.connect(self.clear_all)
         self.convert_button.clicked.connect(self.convert_grammar)
+        self.import_button.clicked.connect(self.import_grammar_file)
 
     def setup_layout(self):
         left_layout = QVBoxLayout()
@@ -98,7 +100,7 @@ class ConvertWindow(QMainWindow):
     def throw_error(self, type, message=""):
         error_window = QMessageBox(self)
         if type == 1:
-            error_window.setWindowTitle("Error occured")
+            error_window.setWindowTitle("Error occurred")
             error_window.setText("Invalid Grammar Format")
             error_window.setInformativeText(message)
             error_window.setIcon(QMessageBox.Critical)
@@ -109,3 +111,18 @@ class ConvertWindow(QMainWindow):
                 "Empty Input",
                 "Enter or import a context-free grammar before converting."
             )
+        elif type == 3:
+            error_window = QMessageBox.critical(self, "Error Occurred", "Failed to open selected file.")
+        elif type == 4:
+            error_window = QMessageBox.critical(self, "Error Occurred", "Could not decode selected file.")
+
+    def import_grammar_file(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Select Grammar File", "", "Text Files (*.txt)")
+        try:
+            with open(path, "r", encoding="utf-8") as file:
+                contents = file.read()
+            self.input_textbox.setPlainText(contents)
+        except OSError:
+            self.throw_error(3)
+        except UnicodeDecodeError:
+            self.throw_error(4)
