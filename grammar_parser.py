@@ -170,3 +170,15 @@ def serialize_grammar(formalized_grammar):
 
     serialized_grammar = "\n".join(grammar_list)
     return serialized_grammar
+
+def flatten_productions(productions):
+    flattened_set = set()
+    rhs_tuple = tuple()
+
+    for production in productions:
+        for element in productions[production]:
+            rhs_tuple = production, element
+            flattened_set.add(rhs_tuple)
+            rhs_tuple = tuple()
+
+    return flattened_set
