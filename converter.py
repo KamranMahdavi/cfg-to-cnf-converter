@@ -27,13 +27,12 @@ def _generate_new_variable(productions, variables, rules=None, start=False, term
     return new_variable
 
 def _check_start_RHS(productions):
-    start_RHS = productions['S']
-    for element in start_RHS:
-        if "S" in element:
-            return False
+    for variable in productions:
+        variable_RHS = productions[variable]
+        for element in variable_RHS:
+            if "S" in element:
+                return False
     return True
-
-
 
 def remove_epsilon_rules(formalized_grammar):
     products = formalized_grammar["productions"]
