@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 from backend import analyze
+from grammar_parser import flatten_productions
 
 class AnalysisViewer(QMainWindow):
 
@@ -22,6 +23,7 @@ class AnalysisViewer(QMainWindow):
         self.slider = QSlider(Qt.Horizontal)
         self.previous_panel = GrammarPanel()
         self.current_panel = GrammarPanel()
+        self.headers = QWidget()
 
         self.setup_connections()
         self.setup_layout()
@@ -36,13 +38,22 @@ class AnalysisViewer(QMainWindow):
         self.slider.setSingleStep(1)
         self.previous_panel.hide()
         self.current_panel.display_productions(self.steps[self.current_index].snapshot)
+        self.headers.hide()
 
         grammar_panel_layout = QHBoxLayout()
         grammar_panel_layout.addWidget(self.previous_panel, alignment=Qt.AlignCenter)
         grammar_panel_layout.addWidget(self.current_panel, alignment=Qt.AlignCenter)
 
+        before_label = QLabel("Before")
+        after_label = QLabel("After")
+        headers_layout = QHBoxLayout()
+        headers_layout.addWidget(before_label, alignment=Qt.AlignCenter)
+        headers_layout.addWidget(after_label, alignment=Qt.AlignCenter)
+        self.headers.setLayout(headers_layout)
+
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.title_label, alignment=Qt.AlignCenter)
+        main_layout.addWidget(self.headers)
         main_layout.addLayout(grammar_panel_layout)
         main_layout.addWidget(self.description_label, alignment=Qt.AlignCenter)
         main_layout.addWidget(self.slider)
@@ -54,13 +65,52 @@ class AnalysisViewer(QMainWindow):
 
     def _get_change_types(self):
         previous_step = self.steps[self.current_index - 1].snapshot
+        previous_step = flatten_productions(previous_step)
         current_step = self.steps[self.current_index].snapshot
+        current_step = flatten_productions(current_step)
         removed = previous_step - current_step
         added = current_step - previous_step
         return removed, added
 
     def navigate(self):
-        pass
+        self.current_index = self.slider.value()
+        self.message_label.setText(f"Step {self.current_index + 1} of {len(self.steps) + 1}")
+        self.display_step(self.current_index)
+
+    def display_step(self, index):
+        if index == 0:
+            self.headers.hide()
+            self.previous_panel.hide()
+            self.current_panel.display_productions(self.steps[self.current_index].snapshot)
+            self.title_label.setText(self.steps[self.current_index].title)
+            self.description_label.setText(self.steps[self.current_index].description)
+
+        elif index == len(self.steps):
+            self.headers.hide()
+            self.previous_panel.hide()
+            self.current_panel.display_productions(self.steps[-1].snapshot)
+            self.title_label.setText("CNF Result")
+            self.description_label.setText(
+                "With this, the conversion is complete.\n"
+                "The grammar is now in Chomsky Normal Form."
+            )
+
+        else:
+            self.headers.show()
+            self.previous_panel.show()
+            removed, added = self._get_change_types()
+            self.previous_panel.display_productions(
+                self.steps[self.current_index - 1].snapshot,
+                removed, 
+                "removed"
+            )
+            self.current_panel.display_productions(
+                self.steps[self.current_index].snapshot,
+                added,
+                "added"
+            )
+            self.title_label.setText(self.steps[self.current_index].title)
+            self.description_label.setText(self.steps[self.current_index].description)
 
 class GrammarPanel(QWidget):
 
