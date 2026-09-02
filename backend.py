@@ -27,9 +27,9 @@ def analyze(grammar):
         description = "No changes were required in this step."
     else:
         description = (
-            "Since the start symbol (S) occured on the right-hand side of the grammar, "
-            f"we introduced a new start variable ({formalized_grammar['start']}), "
-            "which does not occur on any rule's right-hand side."
+            "Since the start symbol (S) appears on the right-hand side of a rule, "
+            f"a new start variable ({formalized_grammar['start']}) is introduced.\n"
+            "This ensures the new start variable never appears on the right-hand side."
         )
     step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
@@ -39,13 +39,10 @@ def analyze(grammar):
         description = "No changes were required in this step."
     else:
         description = (
-            'An ε-rule is a rule of the form "R → ε", where R is not the start symbol.\n'
-            'To remove these rules, we first need to determine all "nullable" variables, that is, '
-            'variables that either have a rule of the form "R → ε" on their right-hand side, or have a right-hand side of the form '
-            '"W X Y Z..." which is composed entirely of variables, and every variable is nullable.\n'
-            'In this step, we replace each rule with all different combinations '
-            'obtained by omitting any subset of its nullable variables.\n' 
-            f'This procedure is done for all variables except for the start variable {formalized_grammar["start"]}.'
+            'An ε-rule allows a variable to create the empty string.\n'
+            'We identify all nullable variables, then generate the necessary alternatives\n'
+            'by omitting nullable variables from existing rules.\n'
+            'ε-rules are then removed, except where ε must be kept for the start variable.'
         )
     step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
@@ -55,8 +52,8 @@ def analyze(grammar):
         description = "No changes were required in this step."
     else:
         description = (
-            'A unit rule is a rule of the form "R → T", where both R and T are variables.\n'
-            'To remove them, simply replace T with the non-unit rules on its right-hand side.\n'
+            'A unit rule has the form "R → T", where both R and T are variables.\n'
+            'We remove it by giving R the non-unit productions reachable by T.\n'
             'This process is repeated until all unit rules get removed.'
         )
     step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
@@ -67,11 +64,9 @@ def analyze(grammar):
         description = "No changes were required in this step."
     else:
         description = (
-            'A rule is in binary form if its right-hand side has at most two symbols (terminals or variables).\n'
-            'First, we find the rules whose right-hand side contains three or more symbols.\n'
-            'Then, we repeatedly split them into smaller rules by introducing new helper variables.\n'
-            'Each helper variable replaces a part of the original production, until every rule has a right-hand side\n'
-            'of at most two symbols.'
+            'In CNF, at most two variables are allowed on the right-hand side of a rule.\n'
+            'Rules with three or more symbols are split into smaller rules by creating new helper variables.\n'
+            'This repeats until every affected rule has at most two symbols on its right-hand side.'
         )
     step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
@@ -81,11 +76,9 @@ def analyze(grammar):
         description = "No changes were required in this step."
     else:
         description = (
-            'A mixed rule is a rule whose right-hand side contains both terminals and variables.\n'
-            'Terminals in Chomsky Normal Form can only appear in rules of the form "R → a", where "R" is a variable and "a" is a terminal.\n'
-            'As a result, any terminal that appears next to other symbols is replaced with a new helper variable\n'
-            'that only derives that specific terminal.\n\n'
-            'With this, the conversion is complete.'
+            'In CNF, terminals can only appear alone on the right-hand side, for example "R → a".\n'
+            'Any terminal appearing alongside other symbols is replaced\n'
+            'by a new helper variable that derives that terminal.\n'
         )
     step_list.append(_take_snapshot(formalized_grammar['productions'], title, description))
 
