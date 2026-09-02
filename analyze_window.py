@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import Qt
+from analysis_viewer import AnalysisViewer
 
 class AnalyzeWindow(QMainWindow):
 
@@ -20,6 +21,7 @@ class AnalyzeWindow(QMainWindow):
         self.import_button = QPushButton("Import")
         self.analyze_button = QPushButton("Analyze")
         self.clear_button = QPushButton("Clear")
+        self.analysis_window = None
 
         self.input_textbox.setPlaceholderText(
             "Enter your context-free grammar here...\n\n"
@@ -54,10 +56,57 @@ class AnalyzeWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def clear_textbox(self):
-        pass
+        self.input_textbox.clear()
+
+    def clear_window_pointer(self):
+        self.analysis_window = None
 
     def analyze_grammar(self):
-        pass
+        if self.analysis_window is not None:
+            self.analysis_window.raise_()
+            self.analysis_window.activateWindow()
+        else:
+            input_grammar = self.input_textbox.toPlainText()
+            if input_grammar == "":
+                self.throw_error(2)
+                return
+            try:
+                self.analysis_window = AnalysisViewer(input_grammar)
+            except ValueError as error:
+                self.throw_error(1, str(error))
+                return
+            self.analysis_window.setAttribute(Qt.WA_DeleteOnClose)
+            self.analysis_window.destroyed.connect(self.clear_window_pointer)
+            self.analysis_window.show()
 
     def import_grammar_file(self):
-        pass
+        path, _ = QFileDialog.getOpenFileName(self, "Select Grammar File", "", "Text Files (*.txt)")
+        if path == "":
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as file:
+                contents = file.read()
+            self.input_textbox.setPlainText(contents)
+        except OSError:
+            self.throw_error(3)
+        except UnicodeDecodeError:
+            self.throw_error(4)
+
+    def throw_error(self, type, message=""):
+        error_window = QMessageBox(self)
+        if type == 1:
+            error_window.setWindowTitle("Error occurred")
+            error_window.setText("Invalid Grammar Format")
+            error_window.setInformativeText(message)
+            error_window.setIcon(QMessageBox.Critical)
+            error_window.exec_()
+        elif type == 2:
+            error_window = QMessageBox.warning(
+                self,
+                "Empty Input",
+                "Enter or import a context-free grammar before analysis."
+            )
+        elif type == 3:
+            error_window = QMessageBox.critical(self, "Error Occurred", "Failed to open selected file.")
+        elif type == 4:
+            error_window = QMessageBox.critical(self, "Error Occurred", "Could not decode selected file.")
