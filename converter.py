@@ -116,7 +116,7 @@ def _remove_unit(productions, unit_rules_dict):
     for variable in unit_rules_dict:
         for unit_var in unit_rules_dict[variable]:
             productions[variable].update(productions[unit_var])
-            productions[variable].remove(tuple(unit_var))
+            productions[variable].remove((unit_var,))
 
 
 
