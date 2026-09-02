@@ -3,9 +3,9 @@ from PyQt5.QtWidgets import (
     QLabel,
     QSlider,
     QVBoxLayout,
-    QHBoxLayout,
     QWidget,
-    QScrollArea
+    QScrollArea,
+    QGridLayout
 )
 from PyQt5.QtCore import Qt
 from backend import analyze
@@ -18,20 +18,23 @@ class AnalysisViewer(QMainWindow):
         self.steps = analyze(grammar)
         self.current_index = 0
 
-        self.message_label = QLabel(f"Step {self.current_index + 1} of {len(self.steps + 1)}")
+        self.message_label = QLabel(f"Step {self.current_index + 1} of {len(self.steps) + 1}")
         self.title_label = QLabel(self.steps[0].title)
         self.description_label = QLabel(self.steps[0].description)
+        self.description_scroll_area = QScrollArea()
         self.slider = QSlider(Qt.Horizontal)
+        self.before_label = QLabel("Before")
+        self.after_label = QLabel("After")
         self.previous_panel = GrammarPanel()
         self.previous_scroll_area = QScrollArea()
         self.current_panel = GrammarPanel()
         self.current_scroll_area = QScrollArea()
-        self.headers = QWidget()
+        self.before_after_grid_layout = QGridLayout()
 
         self.setup_connections()
         self.setup_layout()
         self.setWindowTitle("CFG to CNF Converter - Analysis")
-        self.description_label.hide()
+        self.resize(600, 405)
 
     def setup_connections(self):
         self.slider.valueChanged.connect(self.navigate)
@@ -42,28 +45,25 @@ class AnalysisViewer(QMainWindow):
         self.slider.setSingleStep(1)
         self.previous_scroll_area.hide()
         self.current_panel.display_productions(self.steps[self.current_index].snapshot)
-        self.headers.hide()
-        self.current_scroll_area.setWidgetResizable(True)
-        self.previous_scroll_area.setWidgetResizable(True)
-
-        grammar_panel_layout = QHBoxLayout()
+        self.before_label.hide()
+        self.after_label.hide()
         self.previous_scroll_area.setWidget(self.previous_panel)
         self.current_scroll_area.setWidget(self.current_panel)
-        grammar_panel_layout.addWidget(self.previous_scroll_area, 1)
-        grammar_panel_layout.addWidget(self.current_scroll_area, 1)
+        self.description_scroll_area.setWidget(self.description_label)
+        self.current_scroll_area.setWidgetResizable(True)
+        self.previous_scroll_area.setWidgetResizable(True)
+        self.description_scroll_area.setWidgetResizable(True)
+        self.description_label.setWordWrap(True)
 
-        before_label = QLabel("Before")
-        after_label = QLabel("After")
-        headers_layout = QHBoxLayout()
-        headers_layout.addWidget(before_label, alignment=Qt.AlignCenter)
-        headers_layout.addWidget(after_label, alignment=Qt.AlignCenter)
-        self.headers.setLayout(headers_layout)
+        self.before_after_grid_layout.addWidget(self.before_label, 0, 0, alignment=Qt.AlignCenter)
+        self.before_after_grid_layout.addWidget(self.after_label, 0, 1, alignment=Qt.AlignCenter)
+        self.before_after_grid_layout.addWidget(self.previous_scroll_area, 1, 0)
+        self.before_after_grid_layout.addWidget(self.current_scroll_area, 1, 1)
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.title_label, alignment=Qt.AlignCenter)
-        main_layout.addWidget(self.headers)
-        main_layout.addLayout(grammar_panel_layout)
-        main_layout.addWidget(self.description_label, alignment=Qt.AlignCenter)
+        main_layout.addLayout(self.before_after_grid_layout)
+        main_layout.addWidget(self.description_scroll_area)
         main_layout.addWidget(self.slider)
         main_layout.addWidget(self.message_label, alignment=Qt.AlignCenter)
 
@@ -87,14 +87,16 @@ class AnalysisViewer(QMainWindow):
 
     def display_step(self, index):
         if index == 0:
-            self.headers.hide()
+            self.before_label.hide()
+            self.after_label.hide()
             self.previous_scroll_area.hide()
             self.current_panel.display_productions(self.steps[self.current_index].snapshot)
             self.title_label.setText(self.steps[self.current_index].title)
             self.description_label.setText(self.steps[self.current_index].description)
 
         elif index == len(self.steps):
-            self.headers.hide()
+            self.before_label.hide()
+            self.after_label.hide()
             self.previous_scroll_area.hide()
             self.current_panel.display_productions(self.steps[-1].snapshot)
             self.title_label.setText("CNF Result")
@@ -104,7 +106,8 @@ class AnalysisViewer(QMainWindow):
             )
 
         else:
-            self.headers.show()
+            self.before_label.show()
+            self.after_label.show()
             self.previous_scroll_area.show()
             removed, added = self._get_change_types()
             self.previous_panel.display_productions(
