@@ -140,15 +140,32 @@ class GrammarPanel(QWidget):
     def display_productions(self, productions, highlighted_productions=set(), change_type=""):
         self.clear_productions()
         for production in productions:
-            to_add = QLabel(self._to_string(production, productions[production]))
-            if production in highlighted_productions:
-                to_add.setProperty("changeType", change_type)
+            to_add = QLabel(self._to_string(
+                production,
+                productions[production], 
+                highlighted_productions,
+                change_type
+            ))
             self.QLabel_list.append(to_add)
             self.grammar_layout.addWidget(to_add)
 
-    def _to_string(self, lhs, rhs):
-        rhs_list = []
+    def _to_string(self, lhs, rhs, highlighted_productions, change_type):
+        rhs_string_list = []
+        formatted_rhs_list = []
         for element in rhs:
-            rhs_list.append(" ".join(element))
-        string_rhs = " | ".join(rhs_list)
+            rhs_string_list.append(" ".join(element))
+
+        for item in rhs_string_list:
+            rhs_tuple = tuple(item.split(" "))
+            if (lhs, rhs_tuple) in highlighted_productions:
+                formatted_rhs_list.append(self._formatter_helper(item, change_type))
+            else:
+                formatted_rhs_list.append(item)
+        string_rhs = " | ".join(formatted_rhs_list)
         return lhs + " → " + string_rhs
+
+    def _formatter_helper(self, item, change_type):
+        if change_type == "removed":
+            return f"<span style= 'color: lightcoral; font-weight: bold;'>{item}</span>"
+        elif change_type == "added":
+            return f"<span style= 'color: lightgreen; font-weight: bold;'>{item}</span>"
