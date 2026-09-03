@@ -110,6 +110,7 @@ class AnalysisViewer(QMainWindow):
             self.after_label.show()
             self.previous_scroll_area.show()
             removed, added = self._get_change_types()
+            added_lhs_variables = self._get_lhs_changes()
             self.previous_panel.display_productions(
                 self.steps[self.current_index - 1].snapshot,
                 removed, 
@@ -118,10 +119,16 @@ class AnalysisViewer(QMainWindow):
             self.current_panel.display_productions(
                 self.steps[self.current_index].snapshot,
                 added,
-                "added"
+                "added",
+                added_lhs_variables
             )
             self.title_label.setText(self.steps[self.current_index].title)
             self.description_label.setText(self.steps[self.current_index].description)
+
+    def _get_lhs_changes(self):
+        previous_lhs = self.steps[self.current_index - 1].snapshot
+        current_lhs = self.steps[self.current_index].snapshot
+        return current_lhs.keys() - previous_lhs.keys()
 
 class GrammarPanel(QWidget):
 
@@ -137,19 +144,27 @@ class GrammarPanel(QWidget):
             label.deleteLater()
         self.QLabel_list.clear()
 
-    def display_productions(self, productions, highlighted_productions=set(), change_type=""):
+    def display_productions(
+            self, 
+            productions, 
+            highlighted_productions=set(), 
+            change_type="", 
+            added_lhs=None
+        ):
+        
         self.clear_productions()
         for production in productions:
             to_add = QLabel(self._to_string(
                 production,
                 productions[production], 
                 highlighted_productions,
-                change_type
+                change_type,
+                added_lhs
             ))
             self.QLabel_list.append(to_add)
             self.grammar_layout.addWidget(to_add)
 
-    def _to_string(self, lhs, rhs, highlighted_productions, change_type):
+    def _to_string(self, lhs, rhs, highlighted_productions, change_type, added_lhs=None):
         rhs_string_list = []
         formatted_rhs_list = []
         for element in rhs:
@@ -162,10 +177,17 @@ class GrammarPanel(QWidget):
             else:
                 formatted_rhs_list.append(item)
         string_rhs = " | ".join(formatted_rhs_list)
-        return lhs + " → " + string_rhs
+        return self._rhs_formatter_helper(lhs, added_lhs) + string_rhs
 
     def _formatter_helper(self, item, change_type):
         if change_type == "removed":
             return f"<span style= 'color: lightcoral; font-weight: bold;'>{item}</span>"
         elif change_type == "added":
             return f"<span style= 'color: lightgreen; font-weight: bold;'>{item}</span>"
+
+    def _rhs_formatter_helper(self, lhs, added_rhs):
+        to_ret = lhs + " → "
+        if added_rhs is not None:
+            if lhs in added_rhs:
+                to_ret = f"<span style= 'color: lightgreen; font-weight: bold;'>{lhs} → </span>"
+        return to_ret
