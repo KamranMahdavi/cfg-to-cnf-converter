@@ -32,12 +32,15 @@ class MainWindow(QMainWindow):
 
     def setup_layout(self):
         title = QLabel("CFG → CNF")
+        title.setObjectName("titleLabel")
         self.header.addWidget(title, alignment=Qt.AlignCenter)
         self.header.addStretch()
         self.header.addWidget(self.options_button)
 
         example_tab = ExampleTab()
+        example_tab.setObjectName("exampleTab")
         convert_analyze_tab = ConvertAnalyzeTab()
+        convert_analyze_tab.setObjectName("convertAnalyzeTab")
 
         self.tabs.addTab(convert_analyze_tab, "Convert/Analyze")
         self.tabs.addTab(example_tab, "Explore Example")
