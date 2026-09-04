@@ -1,12 +1,9 @@
 from PyQt5.QtWidgets import (
-
-    QApplication,
     QWidget,
     QLabel,
     QPushButton,
     QVBoxLayout,
     QHBoxLayout
-
 )
 
 from PyQt5.QtCore import Qt
@@ -42,3 +39,4 @@ class ConvertAnalyzeTab(QWidget):
         main_layout.addLayout(buttons_layout)
 
         self.setLayout(main_layout)
+        self.setAttribute(Qt.WA_StyledBackground, True)
