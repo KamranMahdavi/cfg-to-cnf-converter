@@ -72,3 +72,28 @@ QPlainTextEdit {
     border-radius: 6px;
     color: rgb(225, 228, 232);
 }
+
+QScrollArea {
+    border: 2px solid rgb(60, 64, 70);
+    border-radius: 6px;
+}
+
+QLabel#descriptionLabel {
+    background-color: rgb(27, 29, 33);
+}
+
+GrammarPanel {
+    background-color: rgb(27, 29, 33);
+}
+
+QSlider::handle {
+    background-color: rgb(75, 80, 87);
+}
+
+QSlider::handle:hover {
+    background-color: rgb(95, 101, 109);
+}
+
+QSlider::handle:pressed {
+    background-color: rgb(60, 64, 70);
+}
