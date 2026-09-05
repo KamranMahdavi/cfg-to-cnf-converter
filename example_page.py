@@ -26,6 +26,7 @@ class ExampleTab(QWidget):
         self.example_button = QPushButton("Explore Example")
 
         self.setup_layout()
+        self.setProperty("appContent", True)
 
     def setup_layout(self):
         main_layout = QVBoxLayout()

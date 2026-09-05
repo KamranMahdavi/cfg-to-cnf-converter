@@ -26,6 +26,7 @@ class ConvertAnalyzeTab(QWidget):
         self.analyze = QPushButton("Analyze Grammar")
 
         self.setup_layout()
+        self.setProperty("appContent", True)
 
     def setup_layout(self):
         main_layout = QVBoxLayout()

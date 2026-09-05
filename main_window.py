@@ -26,6 +26,7 @@ class MainWindow(QMainWindow):
         self.setup_layout()
         self.options_sidebar.hide()
         self.setMinimumWidth(490)
+        self.setWindowTitle("CFG to CNF Converter")
 
     def setup_connections(self):
         self.options_button.pressed.connect(self.toggle_sidebar)
@@ -55,6 +56,7 @@ class MainWindow(QMainWindow):
 
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
+        central_widget.setProperty("appContent", True)
         self.setCentralWidget(central_widget)
 
     def toggle_sidebar(self):

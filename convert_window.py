@@ -77,6 +77,7 @@ class ConvertWindow(QMainWindow):
         main_layout.addLayout(button_layout)
 
         central_widget.setLayout(main_layout)
+        central_widget.setProperty("appContent", True)
         self.setCentralWidget(central_widget)
 
     def clear_all(self):

@@ -69,6 +69,7 @@ class AnalysisViewer(QMainWindow):
 
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
+        central_widget.setProperty("appContent", True)
         self.setCentralWidget(central_widget)
 
     def _get_change_types(self):
