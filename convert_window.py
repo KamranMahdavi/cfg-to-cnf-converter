@@ -119,6 +119,8 @@ class ConvertWindow(QMainWindow):
 
     def import_grammar_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Select Grammar File", "", "Text Files (*.txt)")
+        if path == "":
+            return
         try:
             with open(path, "r", encoding="utf-8") as file:
                 contents = file.read()
