@@ -21,6 +21,7 @@ class AnalysisViewer(QMainWindow):
         self.message_label = QLabel(f"Step {self.current_index + 1} of {len(self.steps) + 1}")
         self.title_label = QLabel(self.steps[0].title)
         self.description_label = QLabel(self.steps[0].description)
+        self.description_label.setObjectName("descriptionLabel")
         self.description_scroll_area = QScrollArea()
         self.slider = QSlider(Qt.Horizontal)
         self.before_label = QLabel("Before")
@@ -139,6 +140,7 @@ class GrammarPanel(QWidget):
         self.grammar_layout = QVBoxLayout()
 
         self.setLayout(self.grammar_layout)
+        self.setAttribute(Qt.WA_StyledBackground, True)
 
     def clear_productions(self):
         for label in self.QLabel_list:
