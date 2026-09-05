@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import Qt
+from analysis_viewer import AnalysisViewer
 
 class ExampleTab(QWidget):
 
@@ -24,9 +25,14 @@ class ExampleTab(QWidget):
         )
         self.subtitle2.setAlignment(Qt.AlignCenter)
         self.example_button = QPushButton("Explore Example")
+        self.analysis_window = None
 
+        self.setup_connections()
         self.setup_layout()
         self.setProperty("appContent", True)
+
+    def setup_connections(self):
+        self.example_button.clicked.connect(self.show_example)
 
     def setup_layout(self):
         main_layout = QVBoxLayout()
@@ -38,3 +44,18 @@ class ExampleTab(QWidget):
 
         self.setLayout(main_layout)
         self.setAttribute(Qt.WA_StyledBackground, True)
+
+    def show_example(self):
+        grammar = """
+        S → A S B | a C
+        A → ε | B
+        B → b
+        C → c
+        """
+        self.analysis_window = AnalysisViewer(grammar)
+        self.analysis_window.setAttribute(Qt.WA_DeleteOnClose)
+        self.analysis_window.destroyed.connect(self.clear_references)
+        self.analysis_window.show()
+
+    def clear_references(self):
+        self.analysis_window = None
