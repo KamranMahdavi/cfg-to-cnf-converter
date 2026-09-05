@@ -6,10 +6,11 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QHBoxLayout,
     QVBoxLayout,
-    QLabel
+    QLabel,
+    QGraphicsOpacityEffect
 )
 
-from PyQt5.QtCore import Qt, QPropertyAnimation
+from PyQt5.QtCore import Qt, QPropertyAnimation, QAbstractAnimation
 from convert_analyze_page import ConvertAnalyzeTab
 from example_page import ExampleTab
 
@@ -74,6 +75,10 @@ class OptionsSideBar(QFrame):
         self.light_button = QPushButton("Light")
         self.dark_button = QPushButton("Dark")
         self.themes_frame = QWidget()
+        self.opacity_effect = QGraphicsOpacityEffect()
+        self.themes_frame.setGraphicsEffect(self.opacity_effect)
+        self.animation = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.themes_frame_open = False
         self.about_button = QPushButton("About")
         self.help_button = QPushButton("Help")
 
@@ -84,12 +89,17 @@ class OptionsSideBar(QFrame):
 
     def setup_connections(self):
         self.themes_button.clicked.connect(self.show_theme_options)
+        self.animation.finished.connect(self.hide_after_finish)
 
     def setup_layout(self):
         themes_layout = QVBoxLayout()
         themes_layout.addWidget(self.light_button)
         themes_layout.addWidget(self.dark_button)
         self.themes_frame.setLayout(themes_layout)
+
+        self.animation.setDuration(350)
+        self.animation.setStartValue(0.0)
+        self.animation.setEndValue(1.0)
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.themes_button)
@@ -102,7 +112,16 @@ class OptionsSideBar(QFrame):
         self.setLayout(main_layout)
 
     def show_theme_options(self):
-        if self.themes_frame.isVisible():
-            self.themes_frame.hide()
-        else:
+        if self.themes_frame_open == False:
+            self.animation.setDirection(QAbstractAnimation.Forward)
             self.themes_frame.show()
+            self.animation.start()
+            self.themes_frame_open = True
+        else:
+            self.animation.setDirection(QAbstractAnimation.Backward)
+            self.animation.start()
+            self.themes_frame_open = False
+
+    def hide_after_finish(self):
+        if not self.themes_frame_open:
+            self.themes_frame.hide()
