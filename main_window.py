@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QPropertyAnimation, QAbstractAnimation
 from convert_analyze_page import ConvertAnalyzeTab
 from example_page import ExampleTab
+from about_window import AboutWindow
 
 class MainWindow(QMainWindow):
 
@@ -81,6 +82,7 @@ class OptionsSideBar(QFrame):
         self.animation = QPropertyAnimation(self.opacity_effect, b"opacity")
         self.themes_frame_open = False
         self.about_button = QPushButton("About")
+        self.about_window_ = None
         self.help_button = QPushButton("Help")
 
         self.setup_connections()
@@ -93,6 +95,8 @@ class OptionsSideBar(QFrame):
         self.animation.finished.connect(self.hide_after_finish)
         self.light_button.clicked.connect(lambda: self.set_theme(False))
         self.dark_button.clicked.connect(lambda: self.set_theme())
+
+        self.about_button.clicked.connect(self.show_about_window)
 
     def setup_layout(self):
         themes_layout = QVBoxLayout()
@@ -137,3 +141,16 @@ class OptionsSideBar(QFrame):
             app.setStyleSheet(style_sheet)
         else:
             app.setStyleSheet("")
+
+    def show_about_window(self):
+        if self.about_window_:
+            self.about_window_.raise_()
+            self.about_window_.activateWindow()
+        else:
+            self.about_window_ = AboutWindow()
+            self.about_window_.setAttribute(Qt.WA_DeleteOnClose)
+            self.about_window_.destroyed.connect(self.clear_references_about)
+            self.about_window_.show()
+
+    def clear_references_about(self):
+        self.about_window_ = None
