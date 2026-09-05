@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import Qt
+from analyze_window import AnalyzeWindow
+from convert_window import ConvertWindow
 
 class ConvertAnalyzeTab(QWidget):
 
@@ -23,10 +25,17 @@ class ConvertAnalyzeTab(QWidget):
         )
         self.subtitle2.setAlignment(Qt.AlignCenter)
         self.convert = QPushButton("Convert Grammar")
+        self.convert_window_ = None
         self.analyze = QPushButton("Analyze Grammar")
+        self.analyze_window_ = None
 
+        self.setup_connections()
         self.setup_layout()
         self.setProperty("appContent", True)
+
+    def setup_connections(self):
+        self.convert.clicked.connect(self.show_convert_window)
+        self.analyze.clicked.connect(self.show_analyze_window)
 
     def setup_layout(self):
         main_layout = QVBoxLayout()
@@ -41,3 +50,21 @@ class ConvertAnalyzeTab(QWidget):
 
         self.setLayout(main_layout)
         self.setAttribute(Qt.WA_StyledBackground, True)
+
+    def show_convert_window(self):
+        self.convert_window_ = ConvertWindow()
+        self.convert_window_.setAttribute(Qt.WA_DeleteOnClose)
+        self.convert_window_.destroyed.connect(self.clear_references_convert)
+        self.convert_window_.show()
+
+    def clear_references_convert(self):
+        self.convert_window_ = None
+
+    def show_analyze_window(self):
+        self.analyze_window_ = AnalyzeWindow()
+        self.analyze_window_.setAttribute(Qt.WA_DeleteOnClose)
+        self.analyze_window_.destroyed.connect(self.clear_references_analyze)
+        self.analyze_window_.show()
+
+    def clear_references_analyze(self):
+        self.analyze_window_ = None
