@@ -8,7 +8,7 @@ OptionsSideBar {
     border-radius: 3px;
 }
 
-QLabel {
+[appContent="true"] QLabel {
     font-family: Arial, Helvetica, sans-serif;
     color: rgb(200, 204, 210);
 }
@@ -48,7 +48,7 @@ QTabWidget::pane {
     border: 1px solid rgb(42, 45, 50)
 }
 
-QPushButton {
+[appContent="true"] QPushButton {
     background-color: rgb(70, 76, 84);
     color: rgb(235, 238, 242);
     padding: 6px 12px;
@@ -56,12 +56,19 @@ QPushButton {
     padding-top: 5px;
 }
 
-QPushButton:hover {
+[appContent="true"] QPushButton:hover {
     background-color: rgb(58, 63, 70);
 }
 
-QPushButton:pressed {
+[appContent="true"] QPushButton:pressed {
     background-color: rgb(58, 63, 70);
     padding-right: 5px;
     padding-bottom: 3px;
+}
+
+QPlainTextEdit {
+    background-color: rgb(27, 29, 33);
+    border: 2px solid rgb(60, 64, 70);
+    border-radius: 6px;
+    color: rgb(225, 228, 232);
 }
