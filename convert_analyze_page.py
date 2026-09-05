@@ -52,19 +52,27 @@ class ConvertAnalyzeTab(QWidget):
         self.setAttribute(Qt.WA_StyledBackground, True)
 
     def show_convert_window(self):
-        self.convert_window_ = ConvertWindow()
-        self.convert_window_.setAttribute(Qt.WA_DeleteOnClose)
-        self.convert_window_.destroyed.connect(self.clear_references_convert)
-        self.convert_window_.show()
+        if self.convert_window_:
+            self.convert_window_.raise_()
+            self.convert_window_.activateWindow()
+        else:
+            self.convert_window_ = ConvertWindow()
+            self.convert_window_.setAttribute(Qt.WA_DeleteOnClose)
+            self.convert_window_.destroyed.connect(self.clear_references_convert)
+            self.convert_window_.show()
 
     def clear_references_convert(self):
         self.convert_window_ = None
 
     def show_analyze_window(self):
-        self.analyze_window_ = AnalyzeWindow()
-        self.analyze_window_.setAttribute(Qt.WA_DeleteOnClose)
-        self.analyze_window_.destroyed.connect(self.clear_references_analyze)
-        self.analyze_window_.show()
+        if self.analyze_window_:
+            self.analyze_window_.raise_()
+            self.analyze_window_.activateWindow()
+        else:
+            self.analyze_window_ = AnalyzeWindow()
+            self.analyze_window_.setAttribute(Qt.WA_DeleteOnClose)
+            self.analyze_window_.destroyed.connect(self.clear_references_analyze)
+            self.analyze_window_.show()
 
     def clear_references_analyze(self):
         self.analyze_window_ = None
