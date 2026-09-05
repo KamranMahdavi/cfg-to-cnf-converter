@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import (
+    QApplication,
     QTabWidget,
     QWidget,
     QFrame,
@@ -90,6 +91,8 @@ class OptionsSideBar(QFrame):
     def setup_connections(self):
         self.themes_button.clicked.connect(self.show_theme_options)
         self.animation.finished.connect(self.hide_after_finish)
+        self.light_button.clicked.connect(lambda: self.set_theme(False))
+        self.dark_button.clicked.connect(lambda: self.set_theme())
 
     def setup_layout(self):
         themes_layout = QVBoxLayout()
@@ -125,3 +128,12 @@ class OptionsSideBar(QFrame):
     def hide_after_finish(self):
         if not self.themes_frame_open:
             self.themes_frame.hide()
+
+    def set_theme(self, is_dark=True):
+        app = QApplication.instance()
+        if is_dark:
+            with open("dark.css", "r", encoding="utf-8") as file:
+                style_sheet = file.read()
+            app.setStyleSheet(style_sheet)
+        else:
+            app.setStyleSheet("")
