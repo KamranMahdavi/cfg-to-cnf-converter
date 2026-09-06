@@ -80,11 +80,14 @@ def _check_LHS(string):
 
 def _normalize(string):
     or_list = {"∣", "│", "┃", "¦"}
-    epsilon_list = {"λ", "epsilon", "eps"}
+    epsilon_list = {"λ"}
+
+    input_string = re.sub(r'\beps\b', 'ε', string)
+    input_string = re.sub(r'\bepsilon\b', 'ε', input_string)
 
     normalized_input = ""
 
-    for char in string:
+    for char in input_string:
         if char == "→":
             normalized_input += "->"
         elif char in or_list:
