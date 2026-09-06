@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import Qt
-from analyze_window import AnalyzeWindow
-from convert_window import ConvertWindow
+from .analyze_window import AnalyzeWindow
+from .convert_window import ConvertWindow
 
 class ConvertAnalyzeTab(QWidget):
 

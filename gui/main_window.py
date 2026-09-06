@@ -12,10 +12,10 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import Qt, QPropertyAnimation, QAbstractAnimation
-from convert_analyze_page import ConvertAnalyzeTab
-from example_page import ExampleTab
-from about_window import AboutWindow
-from help_window import HelpWindow
+from .convert_analyze_page import ConvertAnalyzeTab
+from .example_page import ExampleTab
+from .about_window import AboutWindow
+from .help_window import HelpWindow
 
 class MainWindow(QMainWindow):
 

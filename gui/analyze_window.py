@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import Qt
-from analysis_viewer import AnalysisViewer
+from .analysis_viewer import AnalysisViewer
 
 class AnalyzeWindow(QMainWindow):
 
