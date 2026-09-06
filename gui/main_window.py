@@ -139,7 +139,7 @@ class OptionsSideBar(QFrame):
     def set_theme(self, is_dark=True):
         app = QApplication.instance()
         if is_dark:
-            with open("dark.css", "r", encoding="utf-8") as file:
+            with open("styles/dark.css", "r", encoding="utf-8") as file:
                 style_sheet = file.read()
             app.setStyleSheet(style_sheet)
         else:
