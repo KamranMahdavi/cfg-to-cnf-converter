@@ -1,6 +1,6 @@
 import copy
-from converter import normalize_start_symbol, remove_epsilon_rules, remove_unit_rules, binarize, create_terminal_variables
-from grammar_parser import parse_grammar, tupleize_productions, serialize_grammar
+from .converter import normalize_start_symbol, remove_epsilon_rules, remove_unit_rules, binarize, create_terminal_variables
+from .grammar_parser import parse_grammar, tupleize_productions, serialize_grammar
 
 def convert(grammar):
     formalized_grammar = parse_grammar(grammar)
