@@ -8,8 +8,8 @@ from PyQt5.QtWidgets import (
     QGridLayout
 )
 from PyQt5.QtCore import Qt
-from backend import analyze
-from grammar_parser import flatten_productions
+from backend.backend import analyze
+from backend.grammar_parser import flatten_productions
 
 class AnalysisViewer(QMainWindow):
 
