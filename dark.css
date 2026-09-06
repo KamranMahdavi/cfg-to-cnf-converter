@@ -97,3 +97,7 @@ QSlider::handle:hover {
 QSlider::handle:pressed {
     background-color: rgb(60, 64, 70);
 }
+
+QWidget#helpContent {
+    background-color: rgb(35, 38, 42);
+}
